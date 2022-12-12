@@ -1,0 +1,24 @@
+{
+  "name": "node-traversal",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "woflow",
+  "main": "node-traversal.js",
+  "dependencies": {
+    "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bobjzhang/woflow-nodes.git"
+  },
+  "author": "Bob Z",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bobjzhang/woflow-nodes/issues"
+  },
+  "homepage": "https://github.com/bobjzhang/woflow-nodes#readme"
+}
