@@ -1,16 +1,27 @@
 const STARTING_NODE_ID = "089ef556-dfff-4ff2-9733-654645be56fe";
 const DATA_API_PREFIX = "https://nodes-on-nodes-challenge.herokuapp.com/nodes";
 
-const callDataEndpoint = async (nodeId) => {
-	const response = await fetch(`${DATA_API_PREFIX}/${nodeId}`);
+const callDataEndpoint = async (queryStr) => {
+	const response = await fetch(`${DATA_API_PREFIX}/${queryStr}`);
 	return response;
 };
+
+// Construct batch query
+const batchQuery = (nodeIds) => {
+	const query = nodeIds.reduce((queryString, id) => {
+		return `${queryString},${id}`
+	}, '')
+
+	// strip out the initial ','
+	return query.substring(1)
+}
+
 
 // Process JSON Response
 const processResp = async (nodeAPIPromise) => {
 	const resp = await nodeAPIPromise;
 	const jsonResp = await resp.json();
-	return JSON.parse(JSON.stringify(jsonResp))[0];
+	return JSON.parse(JSON.stringify(jsonResp));
 }
 
 // Add a visited node to map
@@ -27,7 +38,8 @@ const processNode = (node, visitedMap, array) => {
 // Traverse the grapqh and print out the number of unique node IDs, 
 // and the most common node ID.
 const traverseNodes = async () => {
-	const rootNode = await processResp(callDataEndpoint(STARTING_NODE_ID));
+	const rootNodeResp = await processResp(callDataEndpoint(STARTING_NODE_ID));
+	const rootNode = rootNodeResp[0];
 
     let stack = [], array = [], visitedMap = {};
     stack.push(rootNode);
@@ -37,10 +49,9 @@ const traverseNodes = async () => {
         processNode(node, visitedMap, array);
 
         if (node.child_node_ids.length !== 0) {
-            for(var i = node.child_node_ids.length - 1; i >= 0; i--) {
-            	const newNode =  await processResp(callDataEndpoint(node.child_node_ids[i]));
-                stack.push(newNode);
-            }
+        	const queryString = batchQuery(node.child_node_ids);
+           	const newNodes =  await processResp(callDataEndpoint(queryString));
+           	stack = stack.concat(newNodes)
         }
     }    
 
